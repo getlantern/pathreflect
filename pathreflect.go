@@ -15,6 +15,7 @@ func Parse(pathString string) Path {
 	return Path(strings.Split(pathString, "/"))
 }
 
+// Set sets the given value in the given on at this Path.
 func (p Path) Set(on interface{}, val interface{}) error {
 	parent, current, nameOrIndex, err := p.descend(on)
 	if err != nil {
@@ -31,6 +32,7 @@ func (p Path) Set(on interface{}, val interface{}) error {
 	return nil
 }
 
+// Clear clears the given value in the given on at this Path.
 func (p Path) Clear(on interface{}) error {
 	parent, current, nameOrIndex, err := p.descend(on)
 	if err != nil {
