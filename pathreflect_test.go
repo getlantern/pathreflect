@@ -3,15 +3,8 @@ package pathreflect
 import (
 	"testing"
 
-	. "gopkg.in/check.v1"
+	"github.com/getlantern/testify/assert"
 )
-
-// Hook up gocheck into the "go test" runner.
-func Test(t *testing.T) { TestingT(t) }
-
-type MainSuite struct{}
-
-var _ = Suite(&MainSuite{})
 
 type A struct {
 	B      *B
@@ -25,64 +18,57 @@ type B struct {
 	I int
 }
 
-func (s *MainSuite) TestSetOnEmptyRoot(c *C) {
+func TestSetOnEmptyRoot(t *testing.T) {
 	var d *B
 
 	err := Parse("B/E").Set(d, 50)
-	c.Assert(err, Not(IsNil))
+	assert.Error(t, err)
 }
 
-func (s *MainSuite) TestSetOnEmptyParent(c *C) {
+func TestSetOnEmptyParent(t *testing.T) {
 	var d *B
 
 	err := Parse("B/E/dude").Set(d, 50)
-	c.Assert(err, Not(IsNil))
+	assert.Error(t, err)
 }
 
-// func (s *MainSuite) TestSetOnEmptyField(c *C) {
-// 	d := makeData()
-
-// 	err := Parse("B/E").Set(d, map[string]interface{}{"dude": 50})
-// 	c.Assert(err, IsNil)
-// }
-
-func (s *MainSuite) TestNestedPrimitiveInStruct(c *C) {
+func TestNestedPrimitiveInStruct(t *testing.T) {
 	d := makeData()
 
 	err := Parse("B/S").Set(d, "10")
-	c.Assert(err, IsNil)
+	assert.NoError(t, err)
 	err = Parse("B/I").Set(d, 10)
-	c.Assert(err, IsNil)
+	assert.NoError(t, err)
 
-	c.Assert(d.B.S, Equals, "10")
-	c.Assert(d.B.I, Equals, 10)
+	assert.Equal(t, "10", d.B.S)
+	assert.Equal(t, 10, d.B.I)
 }
 
-func (s *MainSuite) TestNestedPrimitiveInMap(c *C) {
+func TestNestedPrimitiveInMap(t *testing.T) {
 	d := makeData()
 
 	err := Parse("MapB/3/S").Set(d, "10")
-	c.Assert(err, IsNil)
+	assert.NoError(t, err)
 	err = Parse("MapB/3/I").Set(d, 10)
-	c.Assert(err, IsNil)
+	assert.NoError(t, err)
 
-	c.Assert(d.MapB["3"].S, Equals, "10")
-	c.Assert(d.MapB["3"].I, Equals, 10)
+	assert.Equal(t, "10", d.MapB["3"].S)
+	assert.Equal(t, 10, d.MapB["3"].I)
 }
 
-func (s *MainSuite) TestNestedPrimitiveInSlice(c *C) {
+func TestNestedPrimitiveInSlice(t *testing.T) {
 	d := makeData()
 
 	err := Parse("SliceB/1/S").Set(d, "10")
-	c.Assert(err, IsNil)
+	assert.NoError(t, err)
 	err = Parse("SliceB/1/I").Set(d, 10)
-	c.Assert(err, IsNil)
+	assert.NoError(t, err)
 
-	c.Assert(d.SliceB[1].S, Equals, "10")
-	c.Assert(d.SliceB[1].I, Equals, 10)
+	assert.Equal(t, "10", d.SliceB[1].S)
+	assert.Equal(t, 10, d.SliceB[1].I)
 }
 
-func (s *MainSuite) TestNestedField(c *C) {
+func TestNestedField(t *testing.T) {
 	d := makeData()
 	orig := d.B
 
@@ -91,13 +77,13 @@ func (s *MainSuite) TestNestedField(c *C) {
 		I: 10,
 	})
 
-	c.Assert(err, IsNil)
-	c.Assert(d.B.S, DeepEquals, "10")
-	c.Assert(d.B.I, DeepEquals, 10)
-	c.Assert(orig, Not(Equals), d.B)
+	assert.NoError(t, err)
+	assert.Equal(t, "10", d.B.S)
+	assert.Equal(t, 10, d.B.I)
+	assert.NotEqual(t, d.B, orig)
 }
 
-func (s *MainSuite) TestNestedMapEntry(c *C) {
+func TestNestedMapEntry(t *testing.T) {
 	d := makeData()
 	orig := d.MapB["3"]
 
@@ -106,13 +92,13 @@ func (s *MainSuite) TestNestedMapEntry(c *C) {
 		I: 10,
 	})
 
-	c.Assert(err, IsNil)
-	c.Assert(d.MapB["3"].S, DeepEquals, "10")
-	c.Assert(d.MapB["3"].I, DeepEquals, 10)
-	c.Assert(orig, Not(Equals), d.B)
+	assert.NoError(t, err)
+	assert.Equal(t, "10", d.MapB["3"].S)
+	assert.Equal(t, 10, d.MapB["3"].I)
+	assert.NotEqual(t, d.B, orig)
 }
 
-func (s *MainSuite) TestNestedSliceEntry(c *C) {
+func TestNestedSliceEntry(t *testing.T) {
 	d := makeData()
 	orig := d.SliceB[1]
 
@@ -121,10 +107,10 @@ func (s *MainSuite) TestNestedSliceEntry(c *C) {
 		I: 10,
 	})
 
-	c.Assert(err, IsNil)
-	c.Assert(d.SliceB[1].S, DeepEquals, "10")
-	c.Assert(d.SliceB[1].I, DeepEquals, 10)
-	c.Assert(orig, Not(Equals), d.B)
+	assert.NoError(t, err)
+	assert.Equal(t, "10", d.SliceB[1].S)
+	assert.Equal(t, 10, d.SliceB[1].I)
+	assert.NotEqual(t, d.B, orig)
 }
 
 func makeData() *A {
