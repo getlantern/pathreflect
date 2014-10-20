@@ -9,10 +9,14 @@ import (
 	"strings"
 )
 
+const (
+	PathSep = "/"
+)
+
 type Path []string
 
 func Parse(pathString string) Path {
-	return Path(strings.Split(pathString, "/"))
+	return Path(strings.Split(pathString, PathSep))
 }
 
 // Set sets the given value in the given on at this Path.
@@ -71,6 +75,10 @@ func (p Path) ZeroValue(on interface{}) (val interface{}, err error) {
 	}
 }
 
+func (p Path) String() string {
+	return strings.Join(p, PathSep)
+}
+
 func (p Path) descend(on interface{}) (parent reflect.Value, current reflect.Value, nameOrIndex string, err error) {
 	if len(p) == 0 {
 		err = fmt.Errorf("Path must contain at least one element")
@@ -95,7 +103,7 @@ func (p Path) descend(on interface{}) (parent reflect.Value, current reflect.Val
 }
 
 func (p Path) through(i int) string {
-	return strings.Join(p[:i], "/")
+	return strings.Join(p[:i], PathSep)
 }
 
 func getChild(parent reflect.Value, nameOrIndex string) (val reflect.Value, err error) {
