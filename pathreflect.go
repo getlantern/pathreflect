@@ -15,24 +15,10 @@ func Parse(pathString string) Path {
 	return Path(strings.Split(pathString, "/"))
 }
 
-func (p Path) Set(to interface{}, val interface{}) error {
-	if len(p) == 0 {
-		return fmt.Errorf("Path must contain at least one element")
-	}
-
-	var parent reflect.Value
-	current := reflect.ValueOf(to)
-	nameOrIndex := ""
-	var err error
-	for i := 0; i < len(p); i++ {
-		if i > 0 {
-			parent = current
-		}
-		nameOrIndex = p[i]
-		current, err = getChild(current, nameOrIndex)
-		if err != nil {
-			return fmt.Errorf("Error traversing beyond path %s", p.through(i))
-		}
+func (p Path) Set(on interface{}, val interface{}) error {
+	parent, current, nameOrIndex, err := p.descend(on)
+	if err != nil {
+		return err
 	}
 
 	if parent.Kind() == reflect.Map {
@@ -43,6 +29,47 @@ func (p Path) Set(to interface{}, val interface{}) error {
 		current.Set(reflect.ValueOf(val))
 	}
 	return nil
+}
+
+func (p Path) Clear(on interface{}) error {
+	parent, current, nameOrIndex, err := p.descend(on)
+	if err != nil {
+		return err
+	}
+
+	if parent.Kind() == reflect.Map {
+		// For maps, remove the value from the parent
+		zeroValueOfValue := reflect.ValueOf(nil)
+		parent.SetMapIndex(reflect.ValueOf(nameOrIndex), zeroValueOfValue)
+	} else {
+		// For structs and slices, set the value using Set on the terminal field
+		zeroValueOfType := reflect.Zero(current.Type())
+		current.Set(zeroValueOfType)
+	}
+	return nil
+}
+
+func (p Path) descend(on interface{}) (parent reflect.Value, current reflect.Value, nameOrIndex string, err error) {
+	if len(p) == 0 {
+		err = fmt.Errorf("Path must contain at least one element")
+		return
+	}
+
+	current = reflect.ValueOf(on)
+	nameOrIndex = ""
+	for i := 0; i < len(p); i++ {
+		if i > 0 {
+			parent = current
+		}
+		nameOrIndex = p[i]
+		current, err = getChild(current, nameOrIndex)
+		if err != nil {
+			err = fmt.Errorf("Error traversing beyond path %s", p.through(i))
+			return
+		}
+	}
+
+	return
 }
 
 func (p Path) through(i int) string {
