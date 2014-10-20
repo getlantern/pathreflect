@@ -1,3 +1,5 @@
+// package pathreflect provides the ability to address an object graph using
+// a path notation and then modify the addressed node.
 package pathreflect
 
 import (
