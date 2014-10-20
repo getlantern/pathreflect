@@ -54,6 +54,14 @@ func TestNestedPrimitiveInStruct(t *testing.T) {
 
 	assert.Equal(t, "", d.B.S, "string field should reset to zero value after clearing")
 	assert.Equal(t, 0, d.B.I, "int field should reset to zero value after clearing")
+
+	zvs, err := ps.ZeroValue(d)
+	assert.NoError(t, err, "Getting zero value of string should succeed")
+	zvi, err := pi.ZeroValue(d)
+	assert.NoError(t, err, "Getting zero value of int should succeed")
+
+	assert.Equal(t, "", zvs, "Zero value of string should be empty string")
+	assert.Equal(t, 0, zvi, "Zero value of int should be 0")
 }
 
 func TestNestedPrimitiveInMap(t *testing.T) {
@@ -122,6 +130,10 @@ func TestNestedField(t *testing.T) {
 	err = p.Clear(d)
 	assert.NoError(t, err, "Clearing struct should succeed")
 	assert.Nil(t, d.B, "struct should be nil after clearing")
+
+	zv, err := p.ZeroValue(d)
+	assert.NoError(t, err, "Getting zero value of struct should succeed")
+	assert.Equal(t, &B{}, zv, "Zero value of struct should match expected")
 }
 
 func TestNestedMapEntry(t *testing.T) {
@@ -143,6 +155,10 @@ func TestNestedMapEntry(t *testing.T) {
 	assert.NoError(t, err, "Clearing struct should succeed")
 	_, found := d.MapB["3"]
 	assert.False(t, found, "struct should be gone from map after clearing")
+
+	zv, err := p.ZeroValue(d)
+	assert.NoError(t, err, "Getting zero value of struct should succeed")
+	assert.Equal(t, &B{}, zv, "Zero value of struct should match expected")
 }
 
 func TestNestedSliceEntry(t *testing.T) {

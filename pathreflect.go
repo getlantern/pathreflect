@@ -51,6 +51,26 @@ func (p Path) Clear(on interface{}) error {
 	return nil
 }
 
+// ZeroValue returns the ZeroValue corresponding to the type of element at this
+// path.
+func (p Path) ZeroValue(on interface{}) (val interface{}, err error) {
+	parent, current, _, err := p.descend(on)
+	if err != nil {
+		return nil, err
+	}
+	var t reflect.Type
+	if parent.Kind() == reflect.Map || parent.Kind() == reflect.Slice || parent.Kind() == reflect.Array {
+		t = parent.Type().Elem()
+	} else {
+		t = current.Type()
+	}
+	if t.Kind() == reflect.Ptr {
+		return reflect.New(t.Elem()).Interface(), nil
+	} else {
+		return reflect.Zero(t).Interface(), nil
+	}
+}
+
 func (p Path) descend(on interface{}) (parent reflect.Value, current reflect.Value, nameOrIndex string, err error) {
 	if len(p) == 0 {
 		err = fmt.Errorf("Path must contain at least one element")
