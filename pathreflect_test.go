@@ -181,6 +181,17 @@ func TestNestedSliceEntry(t *testing.T) {
 	assert.Nil(t, d.SliceB[1], "struct should be gone from slice after clearing")
 }
 
+func TestZeroValue(t *testing.T) {
+	d := map[string]map[string]int{
+		"a": map[string]int{},
+	}
+
+	p := Parse("a/a2")
+	zv, err := p.ZeroValue(d)
+	assert.NoError(t, err, "Getting zero value for nonexistent element should succeed")
+	assert.Equal(t, 0, zv, "Zero value for nonexistent element should be correct")
+}
+
 func makeData() *A {
 	return &A{
 		B: &B{

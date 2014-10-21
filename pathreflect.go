@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	spew "github.com/davecgh/go-spew/spew"
 )
 
 const (
@@ -94,7 +96,7 @@ func (p Path) descend(on interface{}) (parent reflect.Value, current reflect.Val
 		nameOrIndex = p[i]
 		current, err = getChild(current, nameOrIndex)
 		if err != nil {
-			err = fmt.Errorf("Error traversing beyond path %s", p.through(i))
+			err = fmt.Errorf("On %s, error traversing beyond path %s: %s", spew.Sdump(on), p.through(i), err)
 			return
 		}
 	}
@@ -131,7 +133,7 @@ func getChild(parent reflect.Value, nameOrIndex string) (val reflect.Value, err 
 		val = parent.Index(i)
 		return
 	default:
-		err = fmt.Errorf("Unable to extract value from value of kind %s", parent.Kind())
+		err = fmt.Errorf("Unable to extract value %s from value of kind %s", nameOrIndex, parent.Kind())
 		return
 	}
 }
