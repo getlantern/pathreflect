@@ -36,7 +36,7 @@ func (p Path) Get(on interface{}) (interface{}, error) {
 		// For maps, get the value from the parent
 		result := parent.MapIndex(reflect.ValueOf(nameOrIndex))
 		if result == zeroValue {
-			return nil, nil
+			return nil, fmt.Errorf("Unable to get value")
 		}
 		return result.Interface(), nil
 	} else {
