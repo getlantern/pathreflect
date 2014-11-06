@@ -127,6 +127,10 @@ func TestNestedField(t *testing.T) {
 	assert.Equal(t, 10, d.B.I, "int field should reflect value from new struct")
 	assert.NotEqual(t, d.B, orig, "struct should change")
 
+	gotten, err := Parse("B/S").Get(d)
+	assert.NoError(t, err, "Getting nested string should succeed")
+	assert.Equal(t, "10", gotten, "Getting nested string should have gotten right value")
+
 	err = p.Clear(d)
 	assert.NoError(t, err, "Clearing struct should succeed")
 	assert.Nil(t, d.B, "struct should be nil after clearing")
@@ -150,6 +154,10 @@ func TestNestedMapEntry(t *testing.T) {
 	assert.Equal(t, "10", d.MapB["3"].S, "string field should reflect value from new struct")
 	assert.Equal(t, 10, d.MapB["3"].I, "int field should reflect value from new struct")
 	assert.NotEqual(t, d.B, orig, "struct should change")
+
+	gotten, err := Parse("MapB/3/S").Get(d)
+	assert.NoError(t, err, "Getting nested string should succeed")
+	assert.Equal(t, "10", gotten, "Getting nested string should have gotten right value")
 
 	err = p.Clear(d)
 	assert.NoError(t, err, "Clearing struct should succeed")

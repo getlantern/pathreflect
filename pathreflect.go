@@ -15,10 +15,34 @@ const (
 	PathSep = "/"
 )
 
+var (
+	zeroValue = reflect.Value{}
+)
+
 type Path []string
 
 func Parse(pathString string) Path {
 	return Path(strings.Split(pathString, PathSep))
+}
+
+// Get gets the value in the given on at this Path.
+func (p Path) Get(on interface{}) (interface{}, error) {
+	parent, current, nameOrIndex, err := p.descend(on)
+	if err != nil {
+		return nil, err
+	}
+
+	if parent.Kind() == reflect.Map {
+		// For maps, get the value from the parent
+		result := parent.MapIndex(reflect.ValueOf(nameOrIndex))
+		if result == zeroValue {
+			return nil, nil
+		}
+		return result.Interface(), nil
+	} else {
+		// For structs and slices, get the value itself
+		return current.Interface(), nil
+	}
 }
 
 // Set sets the given value in the given on at this Path.
