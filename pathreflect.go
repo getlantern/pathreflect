@@ -23,13 +23,14 @@ type Path []string
 
 func Parse(pathString string) Path {
 	parts := strings.Split(pathString, PathSep)
-	lastIndex := len(parts) - 1
-	lastPart := parts[lastIndex]
-	if lastPart == "" {
-		// Remove trailing slash
-		parts = parts[:lastIndex]
+	finalParts := []string{}
+	// Remove empty parts (i.e. extra slashes)
+	for _, part := range parts {
+		if part != "" {
+			finalParts = append(finalParts, part)
+		}
 	}
-	return Path(parts)
+	return Path(finalParts)
 }
 
 // Get gets the value in the given on at this Path.
