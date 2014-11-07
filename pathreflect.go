@@ -22,7 +22,14 @@ var (
 type Path []string
 
 func Parse(pathString string) Path {
-	return Path(strings.Split(pathString, PathSep))
+	parts := strings.Split(pathString, PathSep)
+	lastIndex := len(parts) - 1
+	lastPart := parts[lastIndex]
+	if lastPart == "" {
+		// Remove trailing slash
+		parts = parts[:lastIndex]
+	}
+	return Path(parts)
 }
 
 // Get gets the value in the given on at this Path.

@@ -35,7 +35,7 @@ func TestSetOnEmptyParent(t *testing.T) {
 func TestNestedPrimitiveInStruct(t *testing.T) {
 	d := makeData()
 
-	ps := Parse("B/S")
+	ps := Parse("B/S/")
 	pi := Parse("B/I")
 
 	err := ps.Set(d, "10")
